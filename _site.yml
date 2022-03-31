@@ -1,0 +1,14 @@
+# nhubao.github.io
+
+name: "Bellabeat Case Study"
+navbar:
+  title: "Bellabeat Case Study"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Final Report"
+      href: final_report.html
+    - text: "Data Cleaning Process"
+      href: data_cleaning_process.html
+    - text: "Final Report Code"
+      href: final_report_code.html

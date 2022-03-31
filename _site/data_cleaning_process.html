@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Data Cleaning Process</title>
+
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Bellabeat Case Study</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="final_report.html">Final Report</a>
+</li>
+<li>
+  <a href="data_cleaning_process.html">Data Cleaning Process</a>
+</li>
+<li>
+  <a href="final_report_code.html">Final Report Code</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Data Cleaning Process</h1>
+
+</div>
+
+
+<div id="prepare-dataset" class="section level2">
+<h2>1. Prepare dataset</h2>
+<p>This document outlines all the steps taken to clean and transform
+Fitbit Fitness Tracker Data (<a
+href="https://www.kaggle.com/arashnic/fitbit"
+class="uri">https://www.kaggle.com/arashnic/fitbit</a>) to prepare data
+for the next stage of analysis.</p>
+<p>Please note this dataset was generated by respondents to a
+distributed survey via Amazon Mechanical Turk between
+03.12.2016-05.12.2016. Thirty eligible Fitbit users consented to the
+submission of personal tracker data, including minute-level output for
+physical activity, heart rate, and sleep monitoring.</p>
+<p>For the purpose of this analysis, only data from 4.12.2016 to
+5.12.2016 will be assessed.</p>
+<p>There are more than 1 million entries in a few of the CSV files
+recorded. Therefore R was used to clean and process the large datasets.
+This dataset has some limitations because the following variables are
+unknown:</p>
+<ul>
+<li>Age</li>
+<li>Sex</li>
+<li>Height</li>
+<li>Weight</li>
+<li>Device type</li>
+<li>Activity type</li>
+</ul>
+<p>The data has been cleaned by ways of removing entries that does not
+make sense, such as having 0 calories for 24 hours, which indicates that
+the device has not been used. The data has also been transformed by ways
+of summarizing the data into weekdays for further analysis.</p>
+<p>The dataset will be checked for appropriate sample size, any NAs,
+appropriate string types, consistant column names and invalid data
+input.</p>
+</div>
+<div id="process-dataset" class="section level2">
+<h2>2 Process Dataset</h2>
+<div id="installing-and-loading-common-packages-and-libraries"
+class="section level4">
+<h4>Installing and loading common packages and libraries</h4>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## Warning: package &#39;tidyverse&#39; was built under R version 4.1.3</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## v ggplot2 3.3.5     v purrr   0.3.4
+## v tibble  3.1.6     v dplyr   1.0.8
+## v tidyr   1.2.0     v stringr 1.4.0
+## v readr   2.1.2     v forcats 0.5.1</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(data.table)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;data.table&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     between, first, last</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     transpose</code></pre>
+<pre class="r"><code>library(lubridate)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:data.table&#39;:
+## 
+##     hour, isoweek, mday, minute, month, quarter, second, wday, week,
+##     yday, year</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<div id="upload-csv-files-into-r" class="section level5">
+<h5>Upload CSV files into R</h5>
+<pre class="r"><code># List files in working directory
+getwd()</code></pre>
+<pre><code>## [1] &quot;C:/Users/LG 14z/Documents/R/nhubao.github.io&quot;</code></pre>
+<pre class="r"><code>list.files(path = &quot;C:/Users/LG 14z/Documents/R/nhubao.github.io/&quot;)</code></pre>
+<pre><code>##  [1] &quot;_site&quot;                        &quot;_site.yml&quot;                   
+##  [3] &quot;daily_activity_clean.csv&quot;     &quot;dailyActivity_merged.csv&quot;    
+##  [5] &quot;data_cleaning_process.Rmd&quot;    &quot;final_report.Rmd&quot;            
+##  [7] &quot;final_report_code.Rmd&quot;        &quot;hourly_activity_clean.csv&quot;   
+##  [9] &quot;hourlyCalories_merged.csv&quot;    &quot;hourlyIntensities_merged.csv&quot;
+## [11] &quot;hourlySteps_merged.csv&quot;       &quot;index.Rmd&quot;                   
+## [13] &quot;nhubao.github.io.Rproj&quot;       &quot;sleepDay_merged.csv&quot;         
+## [15] &quot;weightLogInfo_merged.csv&quot;</code></pre>
+<pre class="r"><code># Read csv files
+daily_activity &lt;- read_csv(&quot;dailyActivity_merged.csv&quot;, show_col_types = FALSE)
+sleep_day &lt;- read_csv(&quot;sleepDay_merged.csv&quot;, show_col_types = FALSE)
+weight_log &lt;- read_csv(&quot;weightLogInfo_merged.csv&quot;, show_col_types = FALSE)
+hourly_steps &lt;- read_csv(&quot;hourlySteps_merged.csv&quot;, show_col_types = FALSE)
+hourly_calories &lt;- read_csv(&quot;hourlyCalories_merged.csv&quot;, show_col_types = FALSE)
+hourly_intensities &lt;- read_csv(&quot;hourlyIntensities_merged.csv&quot;, show_col_types = FALSE)</code></pre>
+</div>
+<div id="check-sample-size" class="section level5">
+<h5>Check sample size</h5>
+<p>The sample size should be at a minimum of 30 based on the Central
+Limit Theorem. The count() will help identify if there are at least 30
+unique entries.</p>
+<pre class="r"><code>n_distinct(daily_activity$Id)</code></pre>
+<pre><code>## [1] 33</code></pre>
+<pre class="r"><code>n_distinct(hourly_calories$Id)</code></pre>
+<pre><code>## [1] 33</code></pre>
+<pre class="r"><code>n_distinct(hourly_intensities$Id)</code></pre>
+<pre><code>## [1] 33</code></pre>
+<pre class="r"><code>n_distinct(hourly_steps$Id)</code></pre>
+<pre><code>## [1] 33</code></pre>
+<pre class="r"><code>n_distinct(sleep_day$Id)</code></pre>
+<pre><code>## [1] 24</code></pre>
+<pre class="r"><code>n_distinct(weight_log$Id)</code></pre>
+<pre><code>## [1] 8</code></pre>
+<p>Due to inadequate sample size, the heartrate, minute_sleep, sleep_day
+and weight_log datasets will not be analyzed.</p>
+</div>
+</div>
+<div id="explore-uploaded-data" class="section level4">
+<h4>Explore uploaded data</h4>
+<p>The ‘glimpse’ function will help to identify if any of the individual
+datasets have different string types, column names, etc.</p>
+<pre class="r"><code># Use glimpse function to preview data types
+glimpse(daily_activity)</code></pre>
+<pre><code>## Rows: 940
+## Columns: 15
+## $ Id                       &lt;dbl&gt; 1503960366, 1503960366, 1503960366, 150396036~
+## $ ActivityDate             &lt;chr&gt; &quot;4/12/2016&quot;, &quot;4/13/2016&quot;, &quot;4/14/2016&quot;, &quot;4/15/~
+## $ TotalSteps               &lt;dbl&gt; 13162, 10735, 10460, 9762, 12669, 9705, 13019~
+## $ TotalDistance            &lt;dbl&gt; 8.50, 6.97, 6.74, 6.28, 8.16, 6.48, 8.59, 9.8~
+## $ TrackerDistance          &lt;dbl&gt; 8.50, 6.97, 6.74, 6.28, 8.16, 6.48, 8.59, 9.8~
+## $ LoggedActivitiesDistance &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+## $ VeryActiveDistance       &lt;dbl&gt; 1.88, 1.57, 2.44, 2.14, 2.71, 3.19, 3.25, 3.5~
+## $ ModeratelyActiveDistance &lt;dbl&gt; 0.55, 0.69, 0.40, 1.26, 0.41, 0.78, 0.64, 1.3~
+## $ LightActiveDistance      &lt;dbl&gt; 6.06, 4.71, 3.91, 2.83, 5.04, 2.51, 4.71, 5.0~
+## $ SedentaryActiveDistance  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ~
+## $ VeryActiveMinutes        &lt;dbl&gt; 25, 21, 30, 29, 36, 38, 42, 50, 28, 19, 66, 4~
+## $ FairlyActiveMinutes      &lt;dbl&gt; 13, 19, 11, 34, 10, 20, 16, 31, 12, 8, 27, 21~
+## $ LightlyActiveMinutes     &lt;dbl&gt; 328, 217, 181, 209, 221, 164, 233, 264, 205, ~
+## $ SedentaryMinutes         &lt;dbl&gt; 728, 776, 1218, 726, 773, 539, 1149, 775, 818~
+## $ Calories                 &lt;dbl&gt; 1985, 1797, 1776, 1745, 1863, 1728, 1921, 203~</code></pre>
+<pre class="r"><code>glimpse(hourly_calories)</code></pre>
+<pre><code>## Rows: 22,099
+## Columns: 3
+## $ Id           &lt;dbl&gt; 1503960366, 1503960366, 1503960366, 1503960366, 150396036~
+## $ ActivityHour &lt;chr&gt; &quot;4/12/2016 12:00:00 AM&quot;, &quot;4/12/2016 1:00:00 AM&quot;, &quot;4/12/20~
+## $ Calories     &lt;dbl&gt; 81, 61, 59, 47, 48, 48, 48, 47, 68, 141, 99, 76, 73, 66, ~</code></pre>
+<pre class="r"><code>glimpse(hourly_intensities) </code></pre>
+<pre><code>## Rows: 22,099
+## Columns: 4
+## $ Id               &lt;dbl&gt; 1503960366, 1503960366, 1503960366, 1503960366, 15039~
+## $ ActivityHour     &lt;chr&gt; &quot;4/12/2016 12:00:00 AM&quot;, &quot;4/12/2016 1:00:00 AM&quot;, &quot;4/1~
+## $ TotalIntensity   &lt;dbl&gt; 20, 8, 7, 0, 0, 0, 0, 0, 13, 30, 29, 12, 11, 6, 36, 5~
+## $ AverageIntensity &lt;dbl&gt; 0.333333, 0.133333, 0.116667, 0.000000, 0.000000, 0.0~</code></pre>
+<pre class="r"><code>glimpse(hourly_steps)</code></pre>
+<pre><code>## Rows: 22,099
+## Columns: 3
+## $ Id           &lt;dbl&gt; 1503960366, 1503960366, 1503960366, 1503960366, 150396036~
+## $ ActivityHour &lt;chr&gt; &quot;4/12/2016 12:00:00 AM&quot;, &quot;4/12/2016 1:00:00 AM&quot;, &quot;4/12/20~
+## $ StepTotal    &lt;dbl&gt; 373, 160, 151, 0, 0, 0, 0, 0, 250, 1864, 676, 360, 253, 2~</code></pre>
+<p>The glimpse function shows that the ‘Id’ columns are listed as ‘’dbl’
+type instead of ‘chr’ string types and ‘Date’ columns are listed as
+‘’chr’ instead of ‘date’. Before analysis, dates should be in ‘date’ and
+Id should be in ‘chr’ string types.</p>
+</div>
+<div id="merge-datasets" class="section level4">
+<h4>2.4 Merge datasets</h4>
+<pre class="r"><code># Combine columns from hourly_calories, hourly_intensities, and hourly_steps datasets.
+hourly_activity &lt;- cbind(hourly_calories, TotalIntensity = hourly_intensities$TotalIntensity, AverageIntensity = hourly_intensities$AverageIntensity, StepTotal = hourly_steps$StepTotal)</code></pre>
+</div>
+<div id="change-chr-and-date-string-types" class="section level4">
+<h4>Change chr and date string types</h4>
+<pre class="r"><code># Change Id columns from &#39;dbl&#39; to &#39;chr&#39; type.
+daily_activity &lt;- mutate(daily_activity, Id = as.character(Id))
+
+hourly_activity &lt;- mutate(hourly_activity, Id = as.character(Id))
+
+# Change Date from &#39;chr&#39; to a date string type
+
+daily_activity$ActivityDate &lt;-as.Date(daily_activity$ActivityDate, &quot;%m/%d/%Y&quot;)
+
+hourly_activity$ActivityHour &lt;- as.POSIXlt(hourly_activity$ActivityHour,format=&quot;%m/%d/%Y %I:%M:%S %p&quot;)</code></pre>
+</div>
+<div id="find-na-values" class="section level4">
+<h4>2.6 Find NA values</h4>
+<pre class="r"><code>anyNA(daily_activity)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>anyNA(hourly_activity)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+</div>
+<div id="find-duplicates" class="section level4">
+<h4>2.7 Find Duplicates</h4>
+<pre class="r"><code>anyDuplicated(daily_activity)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>anyDuplicated(hourly_activity)</code></pre>
+<pre><code>## [1] 0</code></pre>
+</div>
+</div>
+<div id="create-new-variables" class="section level2">
+<h2>3 Create new variables</h2>
+<pre class="r"><code># Assign weekday, month, day, week to daily_activity
+daily_activity &lt;- daily_activity %&gt;% 
+    mutate(month = month(ActivityDate),
+    wday = wday(ActivityDate),
+    day = day(ActivityDate),
+    week = epiweek(ActivityDate))</code></pre>
+<pre class="r"><code>#Assign weekday, month to hourly_activity
+hourly_activity &lt;- hourly_activity %&gt;% 
+    mutate(month = month(ActivityHour),
+    wday = wday(ActivityHour),
+    date = date(ActivityHour),
+    week = epiweek(ActivityHour))</code></pre>
+<pre class="r"><code># Create ModerateActiveMinutes
+daily_activity &lt;- daily_activity %&gt;% 
+  mutate(ModerateActiveMinutes = FairlyActiveMinutes + LightlyActiveMinutes) 
+
+# Determine Activity level
+daily_activity &lt;- daily_activity %&gt;% mutate(ActivityLevel = case_when(
+    ModerateActiveMinutes &gt; 300 | VeryActiveMinutes &gt; 150 ~ &quot;Active&quot;, (ModerateActiveMinutes &gt;= 150 &amp; ModerateActiveMinutes &lt;= 300) | 
+      (VeryActiveMinutes &gt;= 75 &amp; VeryActiveMinutes &lt;= 150) ~ &quot;Normal&quot;,
+    ModerateActiveMinutes &lt; 150 | VeryActiveMinutes &lt; 75 ~ &quot;Sedentary&quot;))</code></pre>
+<pre class="r"><code># Create Meets10000steps
+daily_activity &lt;- daily_activity %&gt;% mutate(Meets10000Steps = case_when(
+    TotalSteps &gt;= 10000 ~ &quot;Yes&quot;, TotalSteps &lt; 10000 ~ &quot;No&quot;))</code></pre>
+<pre class="r"><code># Combined minutes
+daily_activity &lt;- daily_activity %&gt;% 
+  mutate(CombinedMinutes = FairlyActiveMinutes + LightlyActiveMinutes + VeryActiveMinutes + SedentaryMinutes)</code></pre>
+<div id="remove-rows-with-invalid-data-entry" class="section level4">
+<h4>Remove rows with invalid data entry</h4>
+<p>There were a few invalid data points with total calories that are
+equal to 0 and combined daily minutes of less than 30. These data points
+should be deleted from the cleaned dataset.</p>
+<pre class="r"><code># Remove rows with daily calories = 0
+daily_activity &lt;- 
+filter(daily_activity, Calories &gt; 0)
+
+hourly_activity &lt;- 
+filter(hourly_activity, Calories &gt; 0)</code></pre>
+</div>
+</div>
+<div id="save-cleaned-datasets" class="section level2">
+<h2>3. Save cleaned datasets</h2>
+<pre class="r"><code>write.csv(daily_activity, &quot;C:/Users/LG 14z/Documents/R/nhubao.github.io/daily_activity_clean.csv&quot;, row.names = FALSE)
+
+write.csv(hourly_activity, &quot;C:/Users/LG 14z/Documents/R/nhubao.github.io/hourly_activity_clean.csv&quot;, row.names = FALSE)</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
